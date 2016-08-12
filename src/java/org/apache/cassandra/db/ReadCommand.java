@@ -1059,10 +1059,9 @@ public abstract class ReadCommand extends MonitorableImpl implements ReadQuery
             out.writeBoolean(filter.isReversed());
 
             // slice filter's count
-            DataLimits.Kind kind = rangeCommand.limits().kind();
-            boolean isDistinct = (kind == DataLimits.Kind.CQL_LIMIT || kind == DataLimits.Kind.CQL_PAGING_LIMIT) && rangeCommand.limits().perPartitionCount() == 1;
-            if (isDistinct)
-                out.writeInt(1);
+            DataLimits limits = command.limits();
+            if (limits.isDistinct())
+                out.writeInt(1);  // the limit is always 1 for DISTINCT queries
             else
                 out.writeInt(LegacyReadCommandSerializer.updateLimitForQuery(rangeCommand.limits().perPartitionCount(), filter.requestedSlices()));
 
